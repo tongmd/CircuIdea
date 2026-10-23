@@ -1,169 +1,75 @@
-# CircuRead
+# CircuIdea
 
-CircuRead 是一个用于传递早期研究笔记的命令行协议。笔记通过私有 GitHub 交换仓库送到评阅人手中；每次递交都有稳定的 UUID，并保留笔记、路由信息、评阅文件和带签名的 Git 历史。
+CircuIdea 原名 CircuRead，用来记录研究想法、评审反馈、资源投入与贡献来历。
 
-[English](README.md) | [中文](README_CN.md)
+[打开工作台](https://circuidea.pages.dev/) · [English](README.md) · [作者主页](https://stonezhang.com/)
 
-> 当前状态：实验性项目。建议只在互相信任的研究小组内使用，个人想法仓库与交换仓库都应保持私有，并在导入后检查每一处改动。
+![CircuIdea 工作台，展示明确标注的示例数据](docs/workspace.png)
 
-## 已实现的功能
+## 浏览器使用
 
-- `circuread new` 创建 LaTeX 笔记和元数据。
-- `circuread deliver` 为每一组作者与评阅人创建或复用一个私有交换仓库。
-- 每次递交保存在 `deliveries/<uuid>/`，多次递交共享同一条 Git 历史。
-- `circuread review` 单独编辑 `review.tex`，并要求使用签名提交。
-- `circuread fetch` 将反馈导入 `.circuread/reviews/`，不会覆盖原笔记。
-- `circuread route` 安全地修改评阅人列表，不把用户输入拼进 `yq` 表达式。
-- `circuread doctor` 检查依赖、GitHub 登录、签名配置与仓库配置。
+直接打开 https://circuidea.pages.dev/，无需安装或注册。
 
-Git 签名可以让后续篡改变得可检测，但不能让 GitHub 仓库在物理意义上不可修改。
+1. 新建想法，填写提案、标签、评审者和进展状态。
+2. 添加评审与讨论，记录 GPU 小时、人时、CPU 小时、人民币或美元投入。不同单位分别汇总。
+3. 搜索想法、查看活动记录，导出整个工作区的 JSON 备份，或单个想法的笔记 ZIP。
+4. 按需连接已经初始化的 GitHub 私有仓库。使用仅对该仓库开放 Contents 读写权限的 fine-grained token，手动同步 `.circuidea/workspace.json`。
 
-## 依赖
+初次打开是空工作区，内容保存在当前浏览器。清理浏览器数据会丢失本地内容，请定期导出备份。可以主动载入示例；示例有明确标记，替换已有内容前需要确认。
 
-- Bash 4 或更高版本
-- Git
-- 已通过 `gh auth login` 登录的 [GitHub CLI](https://cli.github.com/)
-- [mikefarah/yq](https://github.com/mikefarah/yq) 4.x
-- Git 签名密钥。Git 支持 GPG 或 SSH 签名。
+Token 只保存在当前页面内存，断开或刷新后清除，不写入浏览器存储、JSON 备份或 ZIP。远端修改使用文件 SHA 检测冲突，发生冲突时停止写入。读取远端前请先备份本地内容。浏览器同步生成普通 Git 提交，不等于 CLI 签名交付。目前没有共享账号服务、后台自动同步或自动分配贡献比例。
 
-先检查环境：
+ZIP 包含 Markdown、可用 XeLaTeX 编译的 LaTeX、`note.meta.yml` 和记录评审与资源投入的 `credit.json`，可放入私有想法仓库继续使用 CLI。浏览器活动记录与投入记录可以编辑，不是经过独立核验的存证。
+
+## 签名 Git 交付
+
+新版命令为 `circuidea`，保留旧 `circuread` 命令与交付协议兼容性。需要 Bash 4+、Git、已登录的 `gh`、mikefarah/yq v4，以及配置好的 Git 签名密钥。
 
 ```bash
-circuread doctor
+git clone https://github.com/tongmd/CircuIdea.git
+cd CircuIdea
+mkdir -p "$HOME/.local/bin"
+install -m 755 circuidea circuread "$HOME/.local/bin/"
 ```
 
-## 安装
-
-```bash
-git clone https://github.com/tongmd/CircuRead.git
-cd CircuRead
-install -m 0755 circuread "$HOME/.local/bin/circuread"
-```
-
-请确认 `$HOME/.local/bin` 已加入 `PATH`。也可以一次完成 CLI 安装与私有想法仓库初始化：
-
-```bash
-./bootstrap.sh 你的_GITHUB_用户名 ideas 交换仓库组织名
-```
-
-交换仓库所在的 GitHub organization 需要允许你创建私有仓库并邀请 collaborator。
-
-## 配置已有仓库
-
-在私人想法仓库根目录创建 `.circuread.yml`：
+把 `~/.local/bin` 加入 PATH。在自己的私有想法仓库根目录创建 `.circuidea.yml`：
 
 ```yaml
-me: alice
-exchange_org: research-exchange
-upstreams:
-  - bob
+me: YOUR_GITHUB_USER
+exchange_org: YOUR_EXCHANGE_ORG
+upstreams: []
 ```
-
-创建一则笔记：
 
 ```bash
-circuread new notes/topological-qubits
+circuidea doctor
+circuidea new notes/my-idea
+# 编辑 note.tex 和 note.meta.yml，将真实评审者填入 push_to
+git add .circuidea.yml notes/my-idea
+git commit -S -m 'Draft my idea'
+circuidea deliver notes/my-idea/note.tex
+# 评审者执行：circuidea review <delivery-directory>
+circuidea fetch --all
+# 检查导入内容，再按需 git push
 ```
 
-编辑 `notes/topological-qubits/note.tex` 与对应元数据：
+`deliver` 在指定组织创建私有的作者到评审者仓库，邀请指定评审者，提交带 UUID 的签名交付。`review` 签名提交回复，`fetch` 导入快照，不覆盖原始笔记。签名可用于验证可信签名者的来历；仓库所有者仍能改写历史，不能视为不可篡改存储。
 
-```yaml
-title: Topological Qubits
-writer: alice
-readers: []
-push_to:
-  - bob
-  - clara
-```
+新命令优先读取 `.circuidea.yml`，不存在时兼容 `.circuread.yml`。旧命令仍读取旧配置。导入评审继续放在 `.circuread/reviews/`，保持协议兼容。详见[协议文档](docs/protocol.md)。
 
-先在私人仓库中提交原始笔记，再递交：
+`bash bootstrap.sh <github-user> <idea-repo> <exchange-org>` 可创建并推送新的私有想法仓库，再安装两个命令。该命令会执行实际 GitHub 操作，请确认确实需要创建该仓库后使用。
+
+## 开发与部署
+
+界面使用原生 HTML/CSS/JavaScript，没有构建步骤与服务端密钥。
 
 ```bash
-git add notes/topological-qubits
-git commit -S -m "Draft topological-qubits"
-circuread deliver notes/topological-qubits/note.tex
-```
-
-命令会打印本次递交的 ID：
-
-```text
-delivery_id=7da3b87d-5e14-4be0-b882-04bc92f26ad7
-```
-
-交换仓库使用 `<作者>__to__<评阅人>` 命名，并始终复用 `main` 分支，因此后续递交不会产生互不相关的 Git 历史。
-
-## 评阅
-
-评阅人接受 GitHub 邀请、克隆交换仓库，然后运行：
-
-```bash
-circuread review deliveries/7da3b87d-5e14-4be0-b882-04bc92f26ad7
-```
-
-CircuRead 会用 `EDITOR` 打开 `review.tex`，完成后创建签名提交并推送。
-
-## 拉取反馈
-
-作者回到私人想法仓库运行：
-
-```bash
-circuread fetch 7da3b87d-5e14-4be0-b882-04bc92f26ad7
-# 或导入所有可访问的递交
-circuread fetch --all
-```
-
-反馈会保存到：
-
-```text
-.circuread/reviews/<递交 UUID>/<评阅人>/
-```
-
-CircuRead 会创建本地签名提交，但不会自动推送。请先检查 diff，再自行执行 `git push`。
-
-## 命令
-
-| 命令 | 作用 |
-| --- | --- |
-| `doctor` | 检查环境与仓库配置 |
-| `new <目录>` | 创建笔记，但不自动提交 |
-| `deliver <note.tex>` | 生成 UUID，并把签名副本送给评阅人 |
-| `review <递交目录>` | 编辑、签名并推送 `review.tex` |
-| `fetch <uuid\|--all>` | 导入反馈，但不替换原笔记 |
-| `route <meta> add\|remove <用户>` | 安全修改 `push_to` |
-| `sync` | 为 `upstreams` 中的评阅人准备交换仓库 |
-
-旧的 `fetch_edges.sh` 与 `manage_edges.sh` 仍然保留，分别转发到 `fetch --all` 与 `sync`。
-
-## 递交目录
-
-```text
-作者__to__评阅人/
-└── deliveries/
-    └── <uuid>/
-        ├── delivery.yml
-        ├── note.meta.yml
-        ├── note.tex
-        └── review.tex
-```
-
-## 验证签名
-
-```bash
-git log --show-signature --decorate --oneline
-```
-
-信任签名前，应通过其他渠道核对作者的公钥指纹。仓库管理员仍然可以改写 Git 历史；如果审计非常重要，应保留独立克隆或启用分支保护。
-
-## 开发
-
-```bash
+npm run serve  # http://localhost:18972
+npm test
 bash tests/test_cli.sh
 bash tests/test_exchange.sh
-shellcheck circuread bootstrap.sh fetch_edges.sh manage_edges.sh tests/*.sh
+npx wrangler pages deploy web --project-name circuidea --branch main
 ```
 
-CI 会执行相同的语法、行为与 ShellCheck 检查。
+测试覆盖数据模型、GitHub API 模拟、签名交付兼容、浏览器创建/修改、评审/投入、刷新持久化、搜索、备份恢复、ZIP 下载、冲突处理与手机布局。GitHub 同步测试使用模拟 API，不修改用户私有仓库。
 
-## 许可证
-
-MIT © 2025–2026 CircuRead contributors
+图标沿用 Tong Zhang 主页图标。MIT 许可证。

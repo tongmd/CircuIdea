@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f5f1" />
+    <meta
+      name="description"
+      content="CircuIdea：把研究想法、评审、资源投入与贡献记录放在一起。浏览器本地使用，可选 GitHub 私有仓库同步。"
+    />
+    <title>CircuIdea · 想法与协作</title>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="/assets/favicon-96x96.png"
+    />
+    <link rel="icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳至工作区</a>
+    <aside class="sidebar">
+      <a class="brand" href="/"
+        ><img
+          src="/assets/favicon-96x96.png"
+          width="38"
+          height="38"
+          alt="Tong Zhang 的图标"
+        /><span>CircuIdea<span class="brand-dot">.</span></span></a
+      >
+      <div class="workspace-label">RESEARCH WORKSPACE</div>
+      <button class="workspace-button" id="workspace-button">
+        <span class="workspace-avatar">研</span
+        ><span id="workspace-name">我的研究工作区</span><span>⌄</span>
+      </button>
+      <nav aria-label="工作区导航" id="navigation">
+        <button class="nav-item active" data-view="overview">
+          <span>◫</span>工作台
+        </button>
+        <button class="nav-item" data-view="ideas">
+          <span>◈</span>全部想法<span class="nav-count" id="idea-count">0</span>
+        </button>
+        <button class="nav-item" data-view="reviews">
+          <span>☷</span>评审与讨论
+        </button>
+        <button class="nav-item" data-view="resources">
+          <span>↗</span>资源投入
+        </button>
+        <button class="nav-item" data-view="activity">
+          <span>◷</span>活动记录
+        </button>
+        <button class="nav-item mobile-settings" data-action="settings">
+          <span>⚙</span>工作区设置
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="storage-status">
+          <span class="status-dot"></span>
+          <div>
+            <strong id="storage-label">保存在此浏览器</strong
+            ><small id="save-label">本地工作区</small>
+          </div>
+        </div>
+        <button class="nav-item" data-action="settings">
+          <span>⚙</span>工作区设置</button
+        ><a
+          class="source-link"
+          href="https://github.com/tongmd/CircuIdea"
+          target="_blank"
+          rel="noopener"
+          >GitHub 与使用说明 ↗</a
+        ><a
+          class="source-link"
+          href="https://stonezhang.com/"
+          target="_blank"
+          rel="noopener"
+          >Made by Tong Zhang ↗</a
+        >
+      </div>
+    </aside>
+    <div class="shell">
+      <header class="topbar">
+        <span class="breadcrumb"
+          >工作区 <span>/</span> <strong id="view-name">工作台</strong></span
+        >
+        <div class="header-actions">
+          <button
+            class="button subtle"
+            id="connect-button"
+            data-action="connect"
+          >
+            <span>↗</span>连接 GitHub</button
+          ><button class="button primary" data-action="new">＋ 新建想法</button>
+        </div>
+      </header>
+      <main id="main" tabindex="-1">
+        <noscript
+          >请启用 JavaScript 使用
+          CircuIdea。所有本地功能都在浏览器中运行。</noscript
+        >
+      </main>
+      <footer class="footer">
+        <span>CircuIdea · 想法、评审、贡献</span
+        ><button class="text-button" data-action="backup">
+          导出工作区备份 ↗
+        </button>
+      </footer>
+    </div>
+    <dialog id="dialog" aria-labelledby="dialog-title">
+      <form id="dialog-form">
+        <header class="dialog-header">
+          <div>
+            <span class="eyebrow" id="dialog-eyebrow">CIRCUIDEA</span>
+            <h2 id="dialog-title"></h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            id="close-dialog"
+            aria-label="关闭"
+          >
+            ×
+          </button>
+        </header>
+        <div id="dialog-body"></div>
+        <p class="form-error" id="dialog-error" role="alert" hidden></p>
+        <footer class="dialog-footer">
+          <button type="button" class="button subtle" id="cancel-dialog">
+            取消</button
+          ><button class="button primary" id="dialog-submit">保存</button>
+        </footer>
+      </form>
+    </dialog>
+    <input
+      type="file"
+      id="import-file"
+      accept="application/json,.json"
+      hidden
+    />
+    <div id="toast" role="status" aria-live="polite" hidden></div>
+  </body>
+</html>

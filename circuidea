@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# New entry point; keep the signed exchange protocol and legacy storage paths.
+set -Eeuo pipefail
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+export CIRCUIDEA_PROGRAM=circuidea
+export CIRCUIDEA_VERSION=0.3.0
+exec bash "$SCRIPT_DIR/circuread" "$@"

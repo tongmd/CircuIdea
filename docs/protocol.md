@@ -1,6 +1,6 @@
-# CircuRead protocol
+# CircuIdea signed Git exchange protocol
 
-CircuRead separates a researcher's working note from the copy sent for review.
+CircuIdea (formerly CircuRead) separates a researcher's working note from the copy sent for review.
 
 ## Identities and repositories
 
@@ -22,7 +22,7 @@ The author signs the delivery commit. The reviewer signs the review commit. A si
 
 ## Import rule
 
-`circuread fetch` copies exchange snapshots into:
+`circuidea fetch` (or the legacy `circuread fetch`) copies exchange snapshots into:
 
 ```text
 .circuread/reviews/<uuid>/<reviewer>/
@@ -40,3 +40,7 @@ It never copies a review over the source `note.tex`. The author can compare, quo
 
 For stronger audit requirements, protect `main`, require signed commits, retain independent clones, and verify fingerprints outside GitHub.
 
+
+## Browser workspace
+
+The web UI stores a separate versioned JSON workspace locally and optionally at `.circuidea/workspace.json` in a private GitHub repository. Those API commits and editable activity entries are not signed deliveries. Export a note ZIP and use the CLI when a signed exchange is required. Legacy `.circuread/reviews/` paths are retained for compatibility.

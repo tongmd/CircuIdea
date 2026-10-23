@@ -2,9 +2,16 @@
 set -Eeuo pipefail
 shopt -s nullglob
 
-PROGRAM="circuread"
-VERSION="0.2.0"
+PROGRAM="${CIRCUIDEA_PROGRAM:-circuread}"
+VERSION="${CIRCUIDEA_VERSION:-0.2.0}"
 CONFIG_NAME=".circuread.yml"
+if [[ "$PROGRAM" == "circuidea" ]]; then
+  CONFIG_NAME=".circuidea.yml"
+  _config_root=$(git rev-parse --show-toplevel 2>/dev/null || true)
+  if [[ -n "$_config_root" && ! -f "$_config_root/$CONFIG_NAME" && -f "$_config_root/.circuread.yml" ]]; then
+    CONFIG_NAME=".circuread.yml"
+  fi
+fi
 TMP_DIRS=()
 LAST_TMP=""
 
@@ -22,19 +29,19 @@ info() { printf '%s\n' "$*"; }
 ok() { printf 'ok: %s\n' "$*"; }
 
 usage() {
-  cat <<'EOF'
-CircuRead 0.2.0
+  cat <<EOF
+$PROGRAM $VERSION
 
 Usage:
-  circuread doctor
-  circuread new <note-directory>
-  circuread deliver <note.tex>
-  circuread review <delivery-directory>
-  circuread fetch <delivery-uuid|--all>
-  circuread route <note.meta.yml> <add|remove> <github-user>
-  circuread sync
-  circuread version
-  circuread help
+  $PROGRAM doctor
+  $PROGRAM new <note-directory>
+  $PROGRAM deliver <note.tex>
+  $PROGRAM review <delivery-directory>
+  $PROGRAM fetch <delivery-uuid|--all>
+  $PROGRAM route <note.meta.yml> <add|remove> <github-user>
+  $PROGRAM sync
+  $PROGRAM version
+  $PROGRAM help
 
 Commands:
   doctor   Check Git, GitHub authentication, yq, signing, and repository config.
@@ -146,6 +153,9 @@ doctor() {
         printf 'invalid: %s must define me and exchange_org\n' "$CONFIG_NAME" >&2
         failed=1
       fi
+    else
+      printf 'missing: %s in current repository\n' "$CONFIG_NAME" >&2
+      failed=1
     fi
   else
     printf 'missing: %s in current repository\n' "$CONFIG_NAME" >&2
@@ -156,7 +166,7 @@ doctor() {
 }
 
 new_note() {
-  [[ $# -eq 1 ]] || die "usage: circuread new <note-directory>"
+  [[ $# -eq 1 ]] || die "usage: $PROGRAM new <note-directory>"
   load_config
 
   local relative_dir="$1"
@@ -223,7 +233,7 @@ checkout_edge_main() {
 }
 
 deliver() {
-  [[ $# -eq 1 ]] || die "usage: circuread deliver <note.tex>"
+  [[ $# -eq 1 ]] || die "usage: $PROGRAM deliver <note.tex>"
   load_config
   require_github
   require_signing
@@ -297,7 +307,7 @@ EOF
 }
 
 review() {
-  [[ $# -eq 1 ]] || die "usage: circuread review <delivery-directory>"
+  [[ $# -eq 1 ]] || die "usage: $PROGRAM review <delivery-directory>"
   need git
   require_signing
 
@@ -361,7 +371,7 @@ copy_delivery() {
 }
 
 fetch_reviews() {
-  [[ $# -eq 1 ]] || die "usage: circuread fetch <delivery-uuid|--all>"
+  [[ $# -eq 1 ]] || die "usage: $PROGRAM fetch <delivery-uuid|--all>"
   load_config
   require_github
   require_signing
@@ -407,7 +417,7 @@ fetch_reviews() {
 }
 
 route() {
-  [[ $# -eq 3 ]] || die "usage: circuread route <note.meta.yml> <add|remove> <github-user>"
+  [[ $# -eq 3 ]] || die "usage: $PROGRAM route <note.meta.yml> <add|remove> <github-user>"
   need yq
 
   local meta="$1"
@@ -435,7 +445,7 @@ route() {
 }
 
 sync_edges() {
-  [[ $# -eq 0 ]] || die "usage: circuread sync"
+  [[ $# -eq 0 ]] || die "usage: $PROGRAM sync"
   load_config
   require_github
 

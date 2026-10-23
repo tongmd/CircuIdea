@@ -38,7 +38,7 @@ fi
 gh repo create "$ME/$IDEA_REPO" --private --clone
 cd "$IDEA_REPO"
 
-cat > .circuread.yml <<EOF
+cat > .circuidea.yml <<EOF
 me: $ME
 exchange_org: $EXCHANGE_ORG
 upstreams: []
@@ -67,8 +67,8 @@ readers: []
 push_to: []
 EOF
 
-git add .circuread.yml notes/demo
-git commit -S -m "Initialize CircuRead idea repository"
+git add .circuidea.yml notes/demo
+git commit -S -m "Initialize CircuIdea idea repository"
 git branch -M main
 git push -u origin main
 
@@ -76,5 +76,6 @@ mkdir -p "$HOME/.local/bin"
 install -m 0755 "$SCRIPT_DIR/circuread" "$HOME/.local/bin/circuread"
 
 echo "Created private repository $ME/$IDEA_REPO."
-echo "Installed circuread at $HOME/.local/bin/circuread."
+install -m 0755 "$SCRIPT_DIR/circuidea" "$HOME/.local/bin/circuidea"
+echo "Installed circuidea (and the circuread compatibility command) in $HOME/.local/bin."
 echo "Add a reviewer to notes/demo/note.meta.yml before delivering."

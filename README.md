@@ -1,169 +1,83 @@
-# CircuRead
+# CircuIdea
 
-CircuRead is a small command-line protocol for exchanging early research notes through private GitHub repositories. A delivery contains the note, its routing metadata, a review template, and signed Git history.
+A small workspace for research ideas, reviews, and contributions. Previously **CircuRead**.
 
-[English](README.md) | [中文](README_CN.md)
+[Open the workspace](https://circuidea.pages.dev/) · [中文说明](README_CN.md) · [Tong Zhang](https://stonezhang.com/)
 
-> Status: experimental. Use it for trusted research groups, inspect every imported review, and keep the idea repository private.
+![CircuIdea workspace with explicitly labeled example data](docs/workspace.png)
 
-## What works
+## Use the web workspace
 
-- `circuread new` scaffolds a LaTeX note and metadata.
-- `circuread deliver` creates or reuses one private exchange repository per author and reviewer.
-- Every delivery receives a stable UUID and lives under `deliveries/<uuid>/`.
-- `circuread review` edits a separate `review.tex` and requires a signed commit.
-- `circuread fetch` imports reviews under `.circuread/reviews/` without overwriting the source note.
-- `circuread route` updates reviewer metadata without interpolating user input into a `yq` expression.
-- `circuread doctor` checks dependencies, GitHub authentication, signing, and configuration.
+Open **https://circuidea.pages.dev/**. No account or installation is needed.
 
-Git signatures make later changes detectable; they do not make a GitHub repository literally immutable.
+1. Create an idea with a proposal, tags, reviewers, and progress status.
+2. Add reviews and record contributions in GPU hours, human hours, CPU hours, CNY, or USD. Different units are summarized separately.
+3. Search ideas, follow activity, and export a full JSON backup or an individual note ZIP.
+4. Optionally connect an initialized **private GitHub repository**. Use a fine-grained personal access token scoped to that repository with **Contents: read and write**. Read and write `.circuidea/workspace.json` manually through the GitHub sync dialog.
 
-## Requirements
+Your workspace starts empty and is stored in this browser's local storage. Clearing browser data removes local content. Export backups regularly. “Load example” is optional and clearly labels its data; it asks before replacing a nonempty workspace.
 
-- Bash 4 or newer
-- Git
-- [GitHub CLI](https://cli.github.com/) authenticated with `gh auth login`
-- [mikefarah/yq](https://github.com/mikefarah/yq) version 4
-- A configured Git signing key. GPG and SSH signing are both supported by Git.
+GitHub tokens stay in page memory only and are cleared on disconnect or refresh. They are never included in browser storage, JSON backups, or note exports. Remote updates use the file SHA to detect conflicts; a conflict stops the write. Export a local backup before loading a remote version. GitHub API sync creates ordinary commits, not the CLI's signed deliveries. The browser has no shared login service, automatic background sync, or automatic credit allocation.
 
-Check the environment:
+The note ZIP contains `note.md`, XeLaTeX-compatible `note.tex`, `note.meta.yml`, and `credit.json` with reviews and recorded resources. It can be placed in your private idea repository and delivered with the CLI below. Local activity and contribution entries are editable records, not independently verified evidence.
 
-```bash
-circuread doctor
-```
+## Signed Git exchange CLI
 
-## Install
+The original private Git exchange protocol remains available. CircuIdea gives it a new command; `circuread` remains supported for existing installations.
+
+Requirements: Bash 4+, Git, authenticated GitHub CLI (`gh auth login`), [mikefarah/yq v4](https://github.com/mikefarah/yq), and a Git signing key. On macOS install a current Bash and ensure it is on `PATH`.
 
 ```bash
-git clone https://github.com/tongmd/CircuRead.git
-cd CircuRead
-install -m 0755 circuread "$HOME/.local/bin/circuread"
+git clone https://github.com/tongmd/CircuIdea.git
+cd CircuIdea
+mkdir -p "$HOME/.local/bin"
+install -m 755 circuidea circuread "$HOME/.local/bin/"
+# Add ~/.local/bin to PATH; configure your Git identity and signing key.
 ```
 
-Make sure `$HOME/.local/bin` is on `PATH`. To create a new private idea repository and install the CLI in one step:
-
-```bash
-./bootstrap.sh YOUR_GITHUB_USER ideas YOUR_EXCHANGE_ORG
-```
-
-The exchange organization must allow you to create private repositories and invite collaborators.
-
-## Configure an existing idea repository
-
-Create `.circuread.yml` at the repository root:
+At the root of an existing private idea Git repository, create `.circuidea.yml`:
 
 ```yaml
-me: alice
-exchange_org: research-exchange
-upstreams:
-  - bob
+me: YOUR_GITHUB_USER
+exchange_org: YOUR_EXCHANGE_ORG
+upstreams: []
 ```
-
-Create a note:
 
 ```bash
-circuread new notes/topological-qubits
+circuidea doctor
+circuidea new notes/my-idea
+# Edit notes/my-idea/note.tex and note.meta.yml; add real reviewers to push_to.
+git add .circuidea.yml notes/my-idea
+git commit -S -m 'Draft my idea'
+circuidea deliver notes/my-idea/note.tex
+# Reviewer: circuidea review <delivery-directory>
+circuidea fetch --all
+# Inspect imported reviews, then git push when ready.
 ```
 
-Edit `notes/topological-qubits/note.tex` and its metadata:
+`deliver` creates private `<author>__to__<reviewer>` exchange repositories in the configured organization, invites the intended reviewer, and pushes a UUID delivery in a signed commit. `review` signs the response. `fetch` imports snapshots without replacing your original note. Review imports remain under `.circuread/reviews/` for protocol compatibility. `circuidea` reads `.circuidea.yml`, falling back to `.circuread.yml` when no new config exists; the legacy `circuread` command continues to use its original config.
 
-```yaml
-title: Topological Qubits
-writer: alice
-readers: []
-push_to:
-  - bob
-  - clara
-```
+Signed commits provide verifiable provenance when the signer is trusted. Repository owners can still rewrite history. Do not describe this as immutable storage. See [the protocol](docs/protocol.md) for the existing exchange format and its limitations.
 
-Commit the note in the private idea repository, then deliver it:
+For a new private idea repository, `bash bootstrap.sh <github-user> <idea-repo> <exchange-org>` creates and pushes a signed initial repository, then installs both commands. It performs GitHub actions, so use it only when you intend to create that repository.
+
+## Develop and deploy
+
+The UI is static, dependency-free HTML/CSS/JavaScript. No build step or server secrets are needed.
 
 ```bash
-git add notes/topological-qubits
-git commit -S -m "Draft topological-qubits"
-circuread deliver notes/topological-qubits/note.tex
-```
-
-The command prints a value such as:
-
-```text
-delivery_id=7da3b87d-5e14-4be0-b882-04bc92f26ad7
-```
-
-Each exchange repository is named `<author>__to__<reviewer>`. CircuRead reuses its `main` branch, so repeated deliveries preserve history instead of creating unrelated repositories.
-
-## Review
-
-The reviewer accepts the GitHub invitation, clones the exchange repository, and runs:
-
-```bash
-circuread review deliveries/7da3b87d-5e14-4be0-b882-04bc92f26ad7
-```
-
-CircuRead opens `review.tex` in `EDITOR`, creates a signed commit, and pushes it.
-
-## Fetch
-
-From the author's private idea repository:
-
-```bash
-circuread fetch 7da3b87d-5e14-4be0-b882-04bc92f26ad7
-# or import every accessible delivery
-circuread fetch --all
-```
-
-Imported snapshots are stored at:
-
-```text
-.circuread/reviews/<delivery-uuid>/<reviewer>/
-```
-
-CircuRead creates a signed local commit but does not push it automatically. Inspect the diff and run `git push` yourself.
-
-## Commands
-
-| Command | Effect |
-| --- | --- |
-| `doctor` | Validate the local environment and repository |
-| `new <dir>` | Scaffold a note without committing it |
-| `deliver <note.tex>` | Create a UUID and send signed copies to reviewers |
-| `review <delivery-dir>` | Edit, sign, and push `review.tex` |
-| `fetch <uuid\|--all>` | Import review snapshots without replacing the note |
-| `route <meta> add\|remove <user>` | Safely edit `push_to` |
-| `sync` | Prepare exchange repositories listed in `upstreams` |
-
-The legacy `fetch_edges.sh` and `manage_edges.sh` files are compatibility wrappers around `fetch --all` and `sync`.
-
-## Delivery layout
-
-```text
-author__to__reviewer/
-└── deliveries/
-    └── <uuid>/
-        ├── delivery.yml
-        ├── note.meta.yml
-        ├── note.tex
-        └── review.tex
-```
-
-## Verify signatures
-
-```bash
-git log --show-signature --decorate --oneline
-```
-
-Reviewers should verify the author fingerprint out of band before trusting a signature. Repository administrators can rewrite Git history, so keep independent clones or protected branches when auditability matters.
-
-## Development
-
-```bash
+npm run serve             # http://localhost:18972
+npm test                 # model and mocked GitHub API checks
 bash tests/test_cli.sh
-bash tests/test_exchange.sh
-shellcheck circuread bootstrap.sh fetch_edges.sh manage_edges.sh tests/*.sh
+bash tests/test_exchange.sh  # isolated local repos and temporary signing keys
 ```
 
-Continuous integration runs the same syntax, behavior, and ShellCheck checks.
+Browser verification covers idea creation, editing, review/resource entry, reload persistence, search, JSON import/export, ZIP downloads, token storage, GitHub conflict handling, and responsive layouts. GitHub synchronization tests use mocked API responses; no private user repository is altered by the tests.
 
-## License
+Deploy the `web/` directory to Cloudflare Pages with no build command:
 
-MIT © 2025–2026 CircuRead contributors
+```bash
+npx wrangler pages deploy web --project-name circuidea --branch main
+```
+
+The homepage icon and app branding use Tong Zhang's existing site icon. MIT license.

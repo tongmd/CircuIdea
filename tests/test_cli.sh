@@ -49,10 +49,16 @@ EOF
   [[ -f notes/test/note.meta.yml ]]
   grep -q '^writer: alice$' notes/test/note.meta.yml
 
-  if PATH="$TEST_DIR/bin:$PATH" bash "$CLI" new ../escape >/dev/null 2>&1; then
+  PATH="$TEST_DIR/bin:$PATH" bash "$ROOT_DIR/circuidea" new notes/legacy-fallback
+  mv .circuread.yml .circuidea.yml
+  PATH="$TEST_DIR/bin:$PATH" bash "$ROOT_DIR/circuidea" new notes/new-config
+
+  if PATH="$TEST_DIR/bin:$PATH" bash "$ROOT_DIR/circuidea" new ../escape >/dev/null 2>&1; then
     echo "new must reject parent-directory traversal" >&2
     exit 1
   fi
 )
 
-echo "CircuRead CLI tests passed."
+[[ "$(bash "$ROOT_DIR/circuidea" --version)" == "circuidea 0.3.0" ]]
+bash "$ROOT_DIR/circuidea" --help | grep -q "circuidea deliver"
+echo "CircuIdea and legacy CLI tests passed."
