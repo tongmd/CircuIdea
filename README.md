@@ -4,22 +4,12 @@ A small workspace for research ideas, reviews, and contributions. Previously **C
 
 [Open the workspace](https://circuidea.pages.dev/) · [中文说明](README_CN.md) · [Tong Zhang](https://stonezhang.com/)
 
-![CircuIdea workspace with explicitly labeled example data](docs/workspace.png)
 
 ## Use the web workspace
 
-Open **https://circuidea.pages.dev/**. No account or installation is needed.
+Open https://circuidea.pages.dev/. Write an idea and press **记下**. Open any saved idea to continue writing; changes save automatically. Mark it complete when you are done, or continue it later. Search appears when the list grows.
 
-1. Create an idea with a proposal, tags, reviewers, and progress status.
-2. Add reviews and record contributions in GPU hours, human hours, CPU hours, CNY, or USD. Different units are summarized separately.
-3. Search ideas, follow activity, and export a full JSON backup or an individual note ZIP.
-4. Optionally connect an initialized **private GitHub repository**. Use a fine-grained personal access token scoped to that repository with **Contents: read and write**. Read and write `.circuidea/workspace.json` manually through the GitHub sync dialog.
-
-Your workspace starts empty and is stored in this browser's local storage. Clearing browser data removes local content. Export backups regularly. “Load example” is optional and clearly labels its data; it asks before replacing a nonempty workspace.
-
-GitHub tokens stay in page memory only and are cleared on disconnect or refresh. They are never included in browser storage, JSON backups, or note exports. Remote updates use the file SHA to detect conflicts; a conflict stops the write. Export a local backup before loading a remote version. GitHub API sync creates ordinary commits, not the CLI's signed deliveries. The browser has no shared login service, automatic background sync, or automatic credit allocation.
-
-The note ZIP contains `note.md`, XeLaTeX-compatible `note.tex`, `note.meta.yml`, and `credit.json` with reviews and recorded resources. It can be placed in your private idea repository and delivered with the CLI below. Local activity and contribution entries are editable records, not independently verified evidence.
+Content stays in this browser. Existing ideas, reviews, and contribution records are preserved; existing discussion and contribution records can be read within an idea. The web interface has no JSON import/export, token configuration, or synchronization controls. It does not provide cloud storage or shared accounts.
 
 ## Signed Git exchange CLI
 
@@ -72,7 +62,7 @@ bash tests/test_cli.sh
 bash tests/test_exchange.sh  # isolated local repos and temporary signing keys
 ```
 
-Browser verification covers idea creation, editing, review/resource entry, reload persistence, search, JSON import/export, ZIP downloads, token storage, GitHub conflict handling, and responsive layouts. GitHub synchronization tests use mocked API responses; no private user repository is altered by the tests.
+The web interface is checked for idea capture, automatic saving, reload persistence, completion, existing-data preservation, and responsive layouts. Model and GitHub API tests remain isolated from user repositories.
 
 Deploy the `web/` directory to Cloudflare Pages with no build command:
 
