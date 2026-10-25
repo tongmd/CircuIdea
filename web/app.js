@@ -204,27 +204,6 @@ function render() {
       ),
     );
   if (view === "overview") {
-    const hero = el("section", "hero");
-    add(
-      hero,
-      add(
-        el("div"),
-        el("span", "eyebrow", "CIRCUIDEA WORKSPACE"),
-        el("h1", "", "让想法开始流动。"),
-        el("p", "", "从一个问题出发，把提案、评审与实际投入连接起来。"),
-        btn("记录一个新想法 ↗", () => editIdea(), "button primary"),
-      ),
-      add(
-        el("div", "hero-mark"),
-        Object.assign(el("img"), {
-          src: "/assets/favicon-96x96.png",
-          alt: "Tong Zhang 的图标",
-          width: 96,
-          height: 96,
-        }),
-      ),
-    );
-    add(m, hero);
     const stats = el("section", "stats");
     for (const [label, n, help] of [
       ["全部想法", w.ideas.length, "每个问题，都值得被记下"],

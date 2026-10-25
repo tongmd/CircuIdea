@@ -1249,3 +1249,18 @@ dialog::backdrop {
     display: flex;
   }
 }
+
+/* CircuIdea is a notebook, visually distinct from Shui's shared-session UI. */
+:root{--bg:#fff;--surface:#fff;--ink:#21283b;--muted:#71798b;--line:#e5e7ef;--green:#6553bd;--green-soft:#f0edf9;--radius:6px}
+.sidebar{width:220px;background:#182033;color:#d5dbea;border-right:0;padding:28px 18px 20px}
+.brand{font-size:23px;letter-spacing:-1px;color:#fff}.brand-dot{color:#baa9ff}
+.workspace-button{margin-top:25px;background:#252f45;border-color:#3b4458;color:#fff;border-radius:6px}.workspace-avatar{background:#403664;color:#e5dcff}
+.sidebar .nav-item{color:#b7c1d6;border-radius:5px}.sidebar .nav-item.active{background:#6553bd;color:#fff}.sidebar .nav-item:hover{background:#303950;color:#fff}.sidebar .nav-count{background:#ffffff20;color:inherit}
+.sidebar-bottom{border-color:#364056}.sidebar-bottom .storage-status strong{color:#d5dbea}.sidebar-bottom small,.sidebar .source-link{color:#9eabc5}.status-dot{background:#aa98f0}
+.shell{margin-left:220px}.topbar{height:72px;background:#fff;padding:0 36px}.breadcrumb strong{color:#313b51}
+main{max-width:1360px;padding:30px 36px 46px}.page-heading h1,h1{font-family:Georgia,'Songti SC',serif;font-weight:500;letter-spacing:-.5px}.page-heading .eyebrow,.heading-note,.stat-help{display:none}
+.button,.filter-select,input,select,textarea{border-radius:5px}.button.primary{background:#6553bd;border-color:#6553bd}.button.primary:hover{background:#504199}
+.stats{gap:0;margin-bottom:28px;border-top:2px solid #242e44;border-bottom:1px solid var(--line)}.stat{padding:18px 22px;border:0;border-right:1px solid var(--line);border-radius:0;background:transparent}.stat:last-child{border-right:0}.stat-number{font-family:Georgia,serif;font-size:31px;color:#30384e}.stat-label{color:#697187}.stat-icon{display:none}
+.idea-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}.idea-card{border:0;border-top:1px solid #ccd1df;border-radius:0;padding:20px 4px;min-height:205px;box-shadow:none}.idea-card:hover{transform:none;box-shadow:none;border-color:#6553bd}.idea-card h3,.idea-card>.row-title{font-family:Georgia,'Songti SC',serif;font-size:20px}.idea-card p,.idea-card>p{color:#697187}.card-footer{border-color:#ececf2}.status{border-radius:3px}.panel{border-radius:6px;box-shadow:none}.empty{background:#fafafe;border-radius:6px;border:1px dashed #d8d5e8}.empty-symbol{color:#6553bd}.footer{background:white}
+@media(max-width:1000px) and (min-width:801px){.sidebar{width:200px}.shell{margin-left:200px}.topbar{padding:0 24px}main{padding:26px 24px}}
+@media(max-width:800px){.sidebar{position:relative;inset:auto;width:100%;padding:16px 18px 0;background:#182033}.brand{font-size:22px}.workspace-button{margin-top:14px}.sidebar nav{display:flex;flex-wrap:wrap;gap:5px;margin:14px 0 0;padding-bottom:12px}.sidebar .nav-item{flex:0 1 auto;width:auto;padding:9px 10px;font-size:12px}.sidebar-bottom{display:none}.shell{margin-left:0}.topbar{height:64px;padding:0 18px}.breadcrumb{display:none}.header-actions{width:100%;justify-content:space-between}main{padding:24px 18px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:14px 12px}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--line)}.idea-grid{grid-template-columns:1fr}.idea-card{min-height:0;padding:18px 2px}.mobile-settings{display:flex}.overview-bottom{grid-template-columns:1fr}.footer{padding:18px;gap:12px;flex-wrap:wrap}}
