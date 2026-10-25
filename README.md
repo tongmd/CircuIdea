@@ -1,15 +1,15 @@
 # CircuIdea
 
-A small workspace for research ideas, reviews, and contributions. Previously **CircuRead**.
+The ideas workspace within Shui!, with tools for preserving earlier CircuIdea records.
 
 [Open the workspace](https://circuidea.pages.dev/) · [中文说明](README_CN.md) · [Tong Zhang](https://stonezhang.com/)
 
 
-## Use the web workspace
+## Shui! ideas
 
-Open https://circuidea.pages.dev/. Write an idea and press **记下**. Open any saved idea to continue writing; changes save automatically. Mark it complete when you are done, or continue it later. Search appears when the list grows.
+CircuIdea is now part of [Shui!](https://shui-app.stonezhang.com/#ideas). Create and develop ideas there, with parent ideas, feedback, resource requests, approvals and execution in one workspace.
 
-Content stays in this browser. Existing ideas, reviews, and contribution records are preserved; existing discussion and contribution records can be read within an idea. The web interface has no JSON import/export, token configuration, or synchronization controls. It does not provide cloud storage or shared accounts.
+The former [CircuIdea web address](https://circuidea.pages.dev/) opens the Shui! entry. If this browser contains old local ideas, they remain readable and editable. Choose an idea and press **迁入 Shui!**, then sign in and confirm its destination project. No ideas are uploaded automatically, and the original browser records are retained.
 
 ## Signed Git exchange CLI
 
@@ -62,7 +62,7 @@ bash tests/test_cli.sh
 bash tests/test_exchange.sh  # isolated local repos and temporary signing keys
 ```
 
-The web interface is checked for idea capture, automatic saving, reload persistence, completion, existing-data preservation, and responsive layouts. Model and GitHub API tests remain isolated from user repositories.
+The web entry preserves earlier local records and provides explicit, confirmed transfer to Shui!. Model and GitHub API tests remain isolated from user repositories.
 
 Deploy the `web/` directory to Cloudflare Pages with no build command:
 

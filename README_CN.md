@@ -1,15 +1,15 @@
 # CircuIdea
 
-CircuIdea 原名 CircuRead，用来记录研究想法、评审反馈、资源投入与贡献来历。
+CircuIdea 现已并入 Shui! 的想法工作区。
 
 [打开工作台](https://circuidea.pages.dev/) · [English](README.md) · [作者主页](https://stonezhang.com/)
 
 
-## 浏览器使用
+## Shui! 想法工作区
 
-打开 https://circuidea.pages.dev/，直接写下想法，点“记下”。打开一条想法就能继续写，修改自动保存；做完点“完成”，也可以继续推进。想法多起来后会出现搜索。
+CircuIdea 已成为 [Shui!](https://shui-app.stonezhang.com/#ideas) 的一部分。想法、上下级关系、反馈、资源申请、审批与执行在同一个工作区内推进。
 
-内容保存在当前浏览器。已有想法、讨论和投入记录保留，历史讨论与投入可在想法内查看。网页不再提供 JSON 导入导出、token 配置或同步入口；没有云端存储或共享账号服务。
+原 [CircuIdea 网址](https://circuidea.pages.dev/) 作为 Shui! 入口。此浏览器若有旧想法，仍可查看和编辑；打开想法后点“迁入 Shui!”，登录并确认目标项目。不会自动上传，也不会删除原浏览器记录。
 
 ## 签名 Git 交付
 
