@@ -1,4 +1,4 @@
-const SHUI_ORIGIN='https://app.shui.stonezhang.com';
+const SHUI_ORIGIN='https://shui-app.stonezhang.com';
 export function sendToShui(idea,workspace,onStatus=()=>{}) {
  const payload={ideas:[{id:'circuidea:'+workspace.id+':'+idea.id,title:idea.title,body:idea.body,summary:idea.summary||'',reviews:idea.reviews,resources:idea.resources,tags:idea.tags||[],events:workspace.events.filter(e=>e.ideaId===idea.id)}]};
  if(new TextEncoder().encode(JSON.stringify(payload)).length>90000){onStatus('这个想法的历史记录太长，暂时无法发送。');return;}
