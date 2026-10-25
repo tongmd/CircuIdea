@@ -1,3 +1,4 @@
+import {sendToShui} from './shui-transfer.js';
 import {emptyWorkspace,validateWorkspace,updateWorkspace,createIdea,STATUSES} from './model.js';
 const $=s=>document.querySelector(s),KEY='circuidea.workspace.v1';let w=emptyWorkspace(),selected='',query='',blocked=false;
 try{const value=localStorage.getItem(KEY);if(value)w=validateWorkspace(JSON.parse(value));}catch(e){blocked=true;showError('已有记录暂时无法读取，请保留此浏览器数据，不要清理。');}
@@ -20,7 +21,9 @@ function open(id){selected=id;const i=w.ideas.find(x=>x.id===id);render();$('#id
 }
 function setStatus(i){$('#toggle-status').textContent=i.status==='done'?'继续推进':'完成';}
 $('#capture').onsubmit=e=>{e.preventDefault();const value=$('#thought').value.trim();if(!value)return;const lines=value.split('\n');const idea=createIdea({title:lines[0].slice(0,160),body:[lines[0].slice(160),...lines.slice(1)].filter(Boolean).join('\n'),status:'draft'},w.profile.name);if(save('记下想法',x=>x.ideas.unshift(idea),idea.id)){$('#thought').value='';render();$('#thought').focus();}};
-function edit(){if(!selected)return;const title=$('#idea-title').value.trim();if(!title){showError('标题还没有写完，暂未保存。');return;}save('更新想法',x=>{const i=x.ideas.find(i=>i.id===selected);i.title=title;i.body=$('#idea-body').value;i.updatedAt=new Date().toISOString();},selected);}
+function edit(){if(!selected)return;const title=$('#idea-title').value.trim();if(!title){showError('标题还没有写完，暂未保存。');return;}const current=w.ideas.find(i=>i.id===selected);if(current.title===title&&current.body===$('#idea-body').value)return;save('更新想法',x=>{const i=x.ideas.find(i=>i.id===selected);i.title=title;i.body=$('#idea-body').value;i.updatedAt=new Date().toISOString();},selected);}
 $('#idea-title').oninput=edit;$('#idea-body').oninput=edit;
 $('#toggle-status').onclick=()=>{if(!selected)return;edit();if(!$('#error').hidden)return;save('更新进展',x=>{const i=x.ideas.find(i=>i.id===selected);i.status=i.status==='done'?'active':'done';i.updatedAt=new Date().toISOString();},selected);setStatus(w.ideas.find(i=>i.id===selected));};
 $('#back').onclick=()=>{edit();if(!$('#error').hidden)return;selected='';render();};$('#search').oninput=e=>{query=e.target.value;render();};render();
+
+$('#send-shui').onclick=()=>{if(!selected)return;edit();if(!$('#error').hidden)return;sendToShui(w.ideas.find(i=>i.id===selected),w,message=>{$('#transfer-state').textContent=message;});};
